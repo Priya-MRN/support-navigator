@@ -83,7 +83,7 @@ without it — the rule-based path always works.
 ## 📁 Project Structure
 
 ```
-support_chatbot/
+support-navigator/
 ├── src/chatbot/
 │   ├── __init__.py          # __version__
 │   ├── __main__.py          # python -m chatbot
