@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#4F46E5" />
+  <title>Agent Inbox — Support Assistant</title>
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="{{ url_for('static', filename='fonts/plus-jakarta-sans-latin.woff2') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  {% include "_icons.html" %}
+
+  <a class="skip-link" href="#tickets">Skip to tickets</a>
+
+  <div class="inbox-page">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg class="icon"><use href="#i-inbox"></use></svg>
+        </span>
+        <div class="brand-text">
+          <div class="brand-title">Agent Inbox</div>
+          {# This page is a static snapshot — it has no JS and never polls.
+             Saying "Live" claimed a freshness the page does not have. #}
+          <div class="brand-status">
+            <span class="status-online">
+              <span class="status-dot" aria-hidden="true"></span>Snapshot
+            </span>
+            <span class="status-sep" aria-hidden="true"></span>
+            <span class="status-hint">Open escalations · reload to refresh</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a href="{{ url_for('index') }}" class="btn-ghost">
+          <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          <span>Back to chat</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="inbox" id="tickets" tabindex="-1">
+      {% if tickets %}
+        <div class="inbox-head">
+          <span class="count-pill">{{ tickets|length }}</span>
+          <h1 class="inbox-title">
+            open ticket{{ '' if tickets|length == 1 else 's' }}
+          </h1>
+        </div>
+
+        <div class="ticket-grid">
+          {% for t in tickets %}
+            <article class="ticket">
+              <div class="ticket-top">
+                <span class="ticket-id">#{{ t.id }}</span>
+                <span class="ticket-type">{{ t.query_type|topic_label }}</span>
+                <span class="ticket-status status-{{ t.status }}">{{ t.status }}</span>
+              </div>
+
+              <h2 class="ticket-name">{{ t.name }}</h2>
+
+              <a class="ticket-email" href="mailto:{{ t.email }}">
+                <svg class="icon" aria-hidden="true"><use href="#i-mail"></use></svg>
+                {{ t.email }}
+              </a>
+
+              <p class="ticket-msg">{{ t.message }}</p>
+
+              {% if t.transcript %}
+                <details class="ticket-transcript">
+                  <summary>
+                    <svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+                    View transcript
+                  </summary>
+                  <pre>{{ t.transcript }}</pre>
+                </details>
+              {% endif %}
+
+              <time class="ticket-time" datetime="{{ t.created_at }}">
+                <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
+                {{ t.created_at|nice_date }}
+              </time>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <svg class="icon" aria-hidden="true"><use href="#i-inbox"></use></svg>
+          <h2>No open tickets</h2>
+          <p>When a customer asks to talk to a human, their request appears here
+             with the full conversation transcript attached.</p>
+        </div>
+      {% endif %}
+    </main>
+
+    <footer class="page-footer">
+      Customer Support Chatbot v{{ version }}
+    </footer>
+  </div>
+</body>
+</html>

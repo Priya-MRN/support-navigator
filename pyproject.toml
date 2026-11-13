@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "support-chatbot"
+version = "1.0.0"
+description = "A menu-driven customer support chatbot with free-text matching, optional Claude AI fallback, and human-escalation ticketing."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Interconnected" }]
+keywords = ["chatbot", "customer-support", "flask", "cli", "anthropic"]
+
+dependencies = [
+    "flask>=3.0",
+    "colorama>=0.4.6",
+]
+
+[project.optional-dependencies]
+ai = ["anthropic>=0.40"]
+# `lucide` bundles the upstream lucide icon SVGs (v1.23.0 in lucide==1.1.4).
+# It is a build-time/dev dependency only: tools/icontool.py reads the packaged
+# SVGs to generate web/templates/_icons.html. The running app serves the
+# generated sprite and never imports lucide.
+dev = ["pytest>=7.0", "lucide==1.1.4"]
+
+[project.scripts]
+support-bot = "chatbot.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+chatbot = ["data/*.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

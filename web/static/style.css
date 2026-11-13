@@ -1,0 +1,1264 @@
+/* ============================================================================
+   Support Assistant — design system
+   Plus Jakarta Sans + Untitled-UI palette. Self-hosted fonts, no CDN.
+
+   RESPONSIVE STRATEGY — two cooperating layers:
+
+   1. @media (max-width: 900px) is the BASELINE. It works with no JavaScript,
+      on first paint, and on pages that ship no JS at all (agent.html). Every
+      narrow rule below is authored as a shared declaration block listing both
+      the `.is-narrow` class selector and its media-query twin, so the two can
+      never drift apart.
+
+   2. .is-wide / .is-narrow are a PROGRESSIVE ENHANCEMENT. chat.js toggles them
+      from a ResizeObserver measuring the SHELL's own width, so the widget also
+      adapts when embedded in a narrow iframe/modal on a wide viewport — a case
+      no viewport media query can detect.
+
+   Where the two disagree, the container wins, because it is the more specific
+   truth: a 400px-wide shell is narrow no matter how wide the window is. That is
+   why the media block re-asserts the wide layout under `.is-wide` — a wide
+   container inside a narrow viewport (rare, but real: a landscape phone in an
+   embed) must keep the desktop layout it explicitly asked for.
+   ========================================================================== */
+
+/* --- Self-hosted Plus Jakarta Sans (variable, weights 200-800) ----------- */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('fonts/plus-jakarta-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  --indigo: #4F46E5;
+  --indigo-dark: #4338CA;
+  --indigo-deep: #3730A3;
+  --indigo-50: #EEF2FF;
+  --indigo-100: #E0E7FF;
+  --indigo-tint: #F4F3FF;
+  --indigo-200: #C7D2FE;
+  --indigo-300: #A5B4FC;
+
+  --grey-900: #101828;
+  --grey-700: #344054;
+  --grey-600: #475467;
+  --grey-500: #667085;
+  --grey-400: #98A2B3;
+  /* --grey-400 (#98A2B3) is 2.6:1 on white — decorative only (borders, icons,
+     placeholders). Any TEXT that used it now uses --text-muted, which is
+     --grey-500 #667085 at 4.61:1 — passes WCAG AA for normal-size text. */
+  --text-muted: var(--grey-500);
+  --grey-300: #D0D5DD;
+  --grey-200: #E4E7EC;
+  --grey-100: #F2F4F7;
+  --grey-50: #F9FAFB;
+  --grey-25: #FCFCFD;
+  --canvas: #F5F6F8;
+
+  --green: #12B76A;
+  --green-50: #ECFDF3;
+  --green-100: #D1FADF;
+  --green-200: #ABEFC6;
+  --green-300: #6CE9A6;
+  --green-700: #027A48;
+  --green-800: #067647;
+  --green-900: #054F31;
+
+  --red: #B42318;
+  --red-50: #FEF3F2;
+  --red-100: #FEE4E2;
+  --red-200: #FECDCA;
+  --red-300: #FDA29B;
+
+  --font: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', Roboto, sans-serif;
+  --ring: 0 0 0 3px rgba(79, 70, 229, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+/* Skip link — visually hidden until focused, then pinned top-left. */
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -100px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 0 0 10px 10px;
+  background: var(--indigo);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus { top: 0; }
+
+body {
+  font-family: var(--font);
+  color: var(--grey-900);
+  background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Icons: inline SVG sprites, sized by their box. */
+.icon {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  display: block;
+}
+
+/* [hidden] must win over the layout display used by these components,
+   otherwise an "empty" error row still paints its icon. */
+[hidden] { display: none !important; }
+
+/* Shared focus treatment — always visible for keyboard users. */
+:where(a, button, input, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes dotPulse {
+  0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+  30%           { opacity: 1;    transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   App shell
+   ========================================================================== */
+
+.app {
+  /* Fallback chain, in cascade order — the last one the browser understands
+     wins. On mobile browsers with a retracting URL bar, 100vh overflows the
+     visible area and pushes the composer under the toolbar; 100dvh tracks the
+     dynamic viewport so the composer stays reachable. */
+  height: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas);
+}
+
+/* --- Header -------------------------------------------------------------- */
+
+.app-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px clamp(14px, 3vw, 28px);
+  background: #fff;
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  background: linear-gradient(160deg, #4F46E5, #6366F1);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12);
+}
+.brand-mark .icon { width: 21px; height: 21px; }
+
+.brand-text { min-width: 0; overflow: hidden; }
+
+.brand-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+.status-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green-700);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(18, 183, 106, 0.16);
+}
+
+.status-sep {
+  width: 1px;
+  height: 11px;
+  background: var(--grey-200);
+}
+
+.status-hint {
+  font-size: 12px;
+  color: var(--grey-500);
+  font-weight: 500;
+}
+
+/* "Typically replies instantly" and the badge only fit wide containers.
+   Class layer + viewport layer share this block so they cannot drift. */
+.is-narrow .wide-only { display: none; }
+@media (max-width: 900px) {
+  /* The doubled class raises this to 0-2-0 so it beats component rules that
+     set their own display — .badge is inline-flex and appears later in the
+     file, so a plain `.wide-only` selector would lose to it on source order.
+     Scoped to :not(.is-wide) rather than paired with an .is-wide override
+     that re-states display: a container measured wide must fall back to each
+     element's OWN display (inline-flex for .badge, block for the spans), and
+     no single `revert`/`initial` value can express that. */
+  .app:not(.is-wide) .wide-only.wide-only { display: none; }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.btn-ghost,
+.btn-solid {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  font-family: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.btn-ghost .icon,
+.btn-solid .icon { width: 15px; height: 15px; }
+
+.btn-ghost {
+  border: 1px solid var(--grey-300);
+  background: #fff;
+  color: var(--grey-700);
+}
+.btn-ghost:hover { background: var(--grey-50); border-color: var(--grey-400); }
+
+.btn-solid {
+  border: 1px solid transparent;
+  background: var(--indigo);
+  color: #fff;
+  padding: 0 11px;
+}
+.btn-solid:hover { background: var(--indigo-dark); color: #fff; }
+
+/* Narrow: buttons collapse to icon-only squares, still >=36px. */
+.is-narrow .btn-ghost,
+.is-narrow .btn-solid { padding: 0 10px; }
+@media (max-width: 900px) {
+  .btn-ghost,
+  .btn-solid { padding: 0 10px; }
+  .is-wide .btn-ghost { padding: 0 12px; }
+  .is-wide .btn-solid { padding: 0 11px; }
+}
+
+/* AI / rule-based badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--grey-100);
+  color: var(--grey-500);
+  white-space: nowrap;
+}
+.badge-ai { background: var(--indigo-50); color: var(--indigo-deep); }
+
+/* --- Body: rail + main --------------------------------------------------- */
+
+.app-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+.rail {
+  flex: 0 0 288px;
+  width: 288px;
+  overflow-y: auto;
+  background: #fff;
+  border-right: 1px solid var(--grey-200);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* The rail only exists on wide containers. Without the media twin, a 288px
+   fixed rail renders on a 375px phone whenever JS is off or has not hydrated
+   yet — which is exactly the first-paint state chat.html ships. */
+.is-narrow .rail { display: none; }
+@media (max-width: 900px) {
+  .rail { display: none; }
+  .is-wide .rail { display: flex; }
+}
+
+.rail-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 4px 10px;
+}
+
+/* Real <ul><li> markup — putting role="list"/"listitem" on <button> would
+   override the implicit button role in some assistive tech. */
+.rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rail-list > li { display: flex; }
+
+.rail-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--grey-700);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.rail-item:hover { background: var(--indigo-tint); color: var(--indigo-deep); }
+.rail-item[aria-current='true'] {
+  background: var(--indigo-tint);
+  color: var(--indigo-deep);
+}
+
+.rail-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: var(--grey-100);
+  display: grid;
+  place-items: center;
+  color: var(--grey-600);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.rail-icon .icon { width: 16px; height: 16px; }
+.rail-item:hover .rail-icon { background: #fff; color: var(--indigo); }
+
+.rail-item .rail-item-label { flex: 1 1 auto; }
+
+.rail-card {
+  margin-top: auto;
+  border: 1px solid var(--grey-200);
+  border-radius: 12px;
+  padding: 14px;
+  background: var(--grey-25);
+}
+
+.rail-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--grey-900);
+}
+.rail-card-title .icon { width: 16px; height: 16px; color: var(--indigo); }
+
+.rail-card p {
+  margin: 6px 0 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--grey-500);
+  text-wrap: pretty;
+}
+
+.rail-card button {
+  width: 100%;
+  min-height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--indigo-200);
+  background: var(--indigo-50);
+  color: var(--indigo-deep);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.rail-card button:hover { background: var(--indigo-100); }
+
+.chat-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Message scroller ---------------------------------------------------- */
+
+.scroller {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: clamp(16px, 3vw, 28px) clamp(14px, 4vw, 32px) 8px;
+}
+
+.scroller::-webkit-scrollbar { width: 10px; }
+.scroller::-webkit-scrollbar-thumb {
+  background: var(--grey-200);
+  border-radius: 999px;
+  border: 3px solid #fff;
+}
+.scroller { scrollbar-width: thin; scrollbar-color: var(--grey-200) transparent; }
+
+.thread {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.msg { animation: riseIn 0.22s ease both; }
+
+/* Bot side */
+.msg-bot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  max-width: 100%;
+}
+
+.msg-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.msg-who .icon { width: 14px; height: 14px; }
+
+.bubble-bot {
+  min-width: 0;
+  max-width: min(600px, 100%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--grey-200);
+  border-radius: 4px 14px 14px 14px;
+  padding: 13px 15px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.bubble-bot .msg-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--grey-700);
+  text-wrap: pretty;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* Numbered steps */
+.steps {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.steps li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.step-n {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--indigo-tint);
+  color: var(--indigo);
+  font-size: 11.5px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+}
+
+.step-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--grey-600);
+  text-wrap: pretty;
+}
+
+.msg-tail {
+  margin: 2px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--grey-200);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--grey-900);
+}
+
+/* Ticket success card */
+.ticket-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+}
+.ticket-card .icon { width: 18px; height: 18px; color: var(--green-700); }
+.ticket-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green-900);
+}
+.ticket-card-meta {
+  font-size: 12px;
+  color: var(--green-800);
+  margin-top: 1px;
+  overflow-wrap: anywhere;
+}
+
+/* User side */
+.msg-user {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.bubble-user {
+  max-width: min(520px, 88%);
+  background: var(--indigo);
+  color: #fff;
+  border-radius: 14px 4px 14px 14px;
+  padding: 11px 15px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.28);
+  overflow-wrap: anywhere;
+}
+
+/* Typing indicator */
+.typing {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.typing-bubble {
+  display: flex;
+  gap: 5px;
+  padding: 13px 16px;
+  background: #fff;
+  border: 1px solid var(--grey-200);
+  border-radius: 4px 14px 14px 14px;
+}
+.typing-bubble span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--indigo);
+  animation: dotPulse 1.2s infinite;
+}
+.typing-bubble span:nth-child(2) { animation-delay: 0.15s; }
+.typing-bubble span:nth-child(3) { animation-delay: 0.3s; }
+
+/* --- Inline cards (intake gate + escalation form) ------------------------ */
+
+.card {
+  border: 1px solid var(--indigo-200);
+  background: #fff;
+  border-radius: 14px;
+  padding: clamp(14px, 2.5vw, 20px);
+  box-shadow: 0 4px 16px rgba(16, 24, 40, 0.06);
+  animation: riseIn 0.24s ease both;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--grey-100);
+}
+.card-head .icon { width: 18px; height: 18px; color: var(--indigo); }
+
+.card-title {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.card-step {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grey-500);
+  background: var(--grey-100);
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  padding-top: 14px;
+}
+
+/* Narrow containers stack the form to one column. */
+.is-narrow .field-grid { grid-template-columns: 1fr; }
+@media (max-width: 900px) {
+  .field-grid { grid-template-columns: 1fr; }
+  .is-wide .field-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.field.mt { margin-top: 14px; }
+
+.field label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--grey-700);
+}
+
+.field input,
+.field textarea {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--grey-900);
+  border-radius: 9px;
+  border: 1px solid var(--grey-300);
+  background: #fff;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field input {
+  height: 42px;
+  padding: 0 12px;
+}
+.field textarea {
+  padding: 11px 12px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 84px;
+}
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--indigo-300);
+  box-shadow: var(--ring);
+}
+.field input[aria-invalid='true'],
+.field textarea[aria-invalid='true'] { border-color: var(--red-300); }
+.field input::placeholder,
+.field textarea::placeholder { color: var(--grey-400); }
+
+.form-error {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--red);
+}
+.form-error .icon { width: 15px; height: 15px; }
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: none;
+  background: var(--indigo);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.btn-primary:hover { background: var(--indigo-dark); }
+.btn-primary[aria-busy='true'] { opacity: 0.75; cursor: progress; }
+.btn-primary .icon { width: 16px; height: 16px; }
+
+.btn-secondary {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--grey-300);
+  background: #fff;
+  color: var(--grey-700);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.btn-secondary:hover { background: var(--grey-50); }
+
+.card-note {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* --- Composer ------------------------------------------------------------ */
+
+.composer-wrap {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--grey-200);
+  background: #fff;
+  padding: 12px clamp(14px, 4vw, 32px) clamp(14px, 3vw, 18px);
+  padding-bottom: max(clamp(14px, 3vw, 18px), env(safe-area-inset-bottom));
+}
+
+.composer-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Quick replies */
+.replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.replies:empty { display: none; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--grey-300);
+  background: #fff;
+  color: var(--indigo-deep);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.chip:hover { background: var(--indigo-tint); border-color: var(--indigo-300); }
+.chip .icon { width: 14px; height: 14px; }
+
+.chip-yes {
+  border-color: var(--green-200);
+  background: var(--green-50);
+  color: var(--green-700);
+  font-weight: 700;
+  padding: 8px 15px;
+  white-space: nowrap;
+}
+.chip-yes:hover { background: var(--green-100); border-color: var(--green-300); }
+.chip-yes .icon { width: 15px; height: 15px; }
+
+.chip-no {
+  border-color: var(--red-200);
+  background: var(--red-50);
+  color: var(--red);
+  font-weight: 700;
+  padding: 8px 15px;
+  white-space: nowrap;
+}
+.chip-no:hover { background: var(--red-100); border-color: var(--red-300); }
+.chip-no .icon { width: 15px; height: 15px; }
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  transition: opacity 0.2s ease;
+}
+
+/* Dimmed and inert while the intake gate is up. */
+.is-gated .composer { opacity: 0.45; }
+
+.topics-btn {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  border: 1px solid var(--grey-300);
+  background: #fff;
+  color: var(--grey-600);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.topics-btn:hover { background: var(--grey-50); }
+.topics-btn .icon { width: 19px; height: 19px; }
+
+/* The topics button is only for narrow containers — it replaces the rail.
+   This rule is inverted (hide-on-wide), so the no-JS baseline needs the
+   viewport twin to hide it above the breakpoint; otherwise a classless
+   desktop render would show BOTH the rail and the topics button. */
+.is-wide .topics-btn { display: none; }
+@media (min-width: 901px) {
+  .topics-btn { display: none; }
+  /* A narrow shell on a wide viewport (iframe embed) still needs the button. */
+  .is-narrow .topics-btn { display: grid; }
+}
+
+.composer-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 6px 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--grey-300);
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.composer-field:focus-within {
+  border-color: var(--indigo-300);
+  box-shadow: var(--ring);
+}
+
+.composer-field input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 44px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14.5px;
+  color: var(--grey-900);
+}
+.composer-field input::placeholder { color: var(--grey-400); }
+
+.send-btn {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  border: none;
+  background: var(--indigo);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.send-btn:hover { background: var(--indigo-dark); }
+.send-btn .icon { width: 17px; height: 17px; }
+
+.privacy-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.privacy-note .icon { width: 13px; height: 13px; }
+
+/* Screen-reader-only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   Agent inbox
+   ========================================================================== */
+
+.inbox-page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas);
+}
+
+.inbox {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 36px) clamp(16px, 4vw, 32px) 48px;
+}
+
+.inbox-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.inbox-title {
+  font-size: clamp(18px, 3vw, 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.count-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--indigo-50);
+  color: var(--indigo-deep);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.ticket {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--grey-200);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  animation: riseIn 0.22s ease both;
+}
+
+.ticket-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ticket-id {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--indigo);
+  font-variant-numeric: tabular-nums;
+}
+
+.ticket-type {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grey-500);
+  background: var(--grey-100);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.ticket-status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+.status-open {
+  background: var(--green-50);
+  color: var(--green-700);
+  border: 1px solid var(--green-200);
+}
+.status-closed {
+  background: var(--grey-100);
+  color: var(--grey-500);
+  border: 1px solid var(--grey-200);
+}
+
+.ticket-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--grey-900);
+  letter-spacing: -0.01em;
+}
+
+.ticket-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--indigo);
+  text-decoration: none;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.ticket-email:hover { text-decoration: underline; }
+.ticket-email .icon { width: 15px; height: 15px; }
+
+.ticket-msg {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--grey-600);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.ticket-transcript {
+  border-top: 1px dashed var(--grey-200);
+  padding-top: 10px;
+}
+.ticket-transcript summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--grey-500);
+  cursor: pointer;
+  list-style: none;
+  min-height: 24px;
+}
+.ticket-transcript summary::-webkit-details-marker { display: none; }
+.ticket-transcript summary:hover { color: var(--indigo); }
+.ticket-transcript .icon {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.15s ease;
+}
+.ticket-transcript[open] .icon { transform: rotate(90deg); }
+.ticket-transcript pre {
+  margin-top: 10px;
+  max-height: 220px;
+  overflow: auto;
+  background: var(--grey-50);
+  border: 1px solid var(--grey-200);
+  border-radius: 9px;
+  padding: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--grey-600);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ticket-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.ticket-time .icon { width: 14px; height: 14px; }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: clamp(40px, 10vw, 80px) 20px;
+  background: #fff;
+  border: 1px solid var(--grey-200);
+  border-radius: 16px;
+}
+.empty-state .icon {
+  width: 44px;
+  height: 44px;
+  color: var(--grey-300);
+  stroke-width: 1.6;
+}
+.empty-state h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--grey-900);
+}
+.empty-state p {
+  font-size: 14px;
+  color: var(--grey-500);
+  max-width: 44ch;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.page-footer {
+  padding: 16px clamp(14px, 3vw, 28px) 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Mobile — viewport breakpoint
+   agent.html ships no JavaScript, so .is-narrow never lands there and every
+   class-based rule above is inert on the inbox. These viewport rules are the
+   only thing making that page responsive.
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  /* minmax(320px, …) overflows a 390px viewport once page padding is taken
+     off, forcing a horizontal scrollbar. One column below the breakpoint. */
+  .ticket-grid { grid-template-columns: 1fr; }
+
+  /* Long unbroken ids/emails are the other overflow source on a phone. */
+  .ticket-id,
+  .ticket-email { overflow-wrap: anywhere; }
+}
+
+@media (max-width: 560px) {
+  /* The header's brand + actions stop fitting on one line well before the
+     rail breakpoint; let them wrap rather than squeezing the title to
+     an ellipsis stub. */
+  .app-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .inbox-head { gap: 8px; }
+
+  /* Status meta is supplementary — the dot and "Online" carry the signal.
+     Scoped with :not(.is-wide) so an explicitly-wide embedded shell keeps
+     them, without this rule having to re-state their display values. */
+  .app:not(.is-wide) .status-sep,
+  .app:not(.is-wide) .status-hint,
+  .inbox-page .status-sep,
+  .inbox-page .status-hint { display: none; }
+}

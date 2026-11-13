@@ -1,0 +1,265 @@
+{
+  "query_types": [
+    {
+      "id": "billing",
+      "label": "Billing & Payments",
+      "icon": "💳",
+      "lucide": "credit-card",
+      "keywords": [
+        "bill", "billing", "invoice", "invoices", "payment", "pay", "charge", "charged",
+        "refund money", "subscription", "plan", "upgrade", "downgrade",
+        "credit card", "card", "receipt", "price", "pricing", "cost",
+        "double charged", "overcharged", "renew", "renewal", "cancel subscription"
+      ],
+      "steps": [
+        "Open Settings → Billing to see your current plan and payment method.",
+        "Download any invoice from the Invoices tab (PDF, includes tax details).",
+        "To change cards, choose Update payment method and re-enter your details.",
+        "Duplicate or unexpected charges usually clear within 3-5 business days."
+      ],
+      "sub_topics": [
+        {
+          "id": "unexpected_charge",
+          "label": "I was charged twice",
+          "keywords": ["double charged", "overcharged", "unexpected", "wrong charge", "extra charge", "charged twice"],
+          "steps": [
+            "Check the Invoices tab for two entries on the same date.",
+            "Pending authorisations often drop off within 3-5 business days.",
+            "If both invoices are settled, we'll refund the duplicate in full."
+          ]
+        },
+        {
+          "id": "change_plan",
+          "label": "Update my payment method",
+          "keywords": ["upgrade", "downgrade", "cancel subscription", "change plan", "payment method", "update card"],
+          "steps": [
+            "Go to Settings → Billing → Payment method.",
+            "Add the new card, then set it as default.",
+            "Remove the old card once the next invoice succeeds."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "orders",
+      "label": "Orders & Shipping",
+      "icon": "📦",
+      "lucide": "package",
+      "keywords": [
+        "order", "orders", "shipping", "ship", "delivery", "deliver", "track",
+        "tracking", "package", "parcel", "where is my order", "shipment",
+        "delayed", "late", "lost package", "estimated delivery", "courier", "dispatch"
+      ],
+      "steps": [
+        "Open My Orders and select the order you want to check.",
+        "Use Track shipment for live courier updates and the delivery window.",
+        "Orders ship within 1-2 business days; delivery takes 3-7 days.",
+        "If tracking hasn't moved for 5 days, we'll open an investigation with the courier."
+      ],
+      "sub_topics": [
+        {
+          "id": "track_order",
+          "label": "Track my order",
+          "keywords": ["track", "tracking", "where is my order", "status"],
+          "steps": [
+            "Open My Orders and select the order you want to track.",
+            "Copy the tracking number and open the carrier's tracking page.",
+            "Check the Estimated Delivery field for the expected date.",
+            "Enable order notifications to get status updates by email or SMS."
+          ]
+        },
+        {
+          "id": "delayed_order",
+          "label": "My order is late",
+          "keywords": ["delayed", "late", "lost package", "missing", "never arrived"],
+          "steps": [
+            "Confirm the expected window on the order page.",
+            "Check for a delivery attempt notice from the courier.",
+            "If it's more than 3 days late, we'll reship or refund."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "returns",
+      "label": "Returns & Refunds",
+      "icon": "↩️",
+      "lucide": "undo-2",
+      "keywords": [
+        "return", "returns", "refund", "refunds", "money back", "exchange",
+        "send back", "rma", "defective", "damaged", "wrong item", "broken",
+        "replace", "replacement", "return label", "store credit", "refnud"
+      ],
+      "steps": [
+        "Sign in and open My Orders, then select the item you want to return.",
+        "Click Return or exchange and choose a reason for the return.",
+        "Print the prepaid return label and pack the item in its original packaging.",
+        "Drop the package at the carrier and keep your receipt.",
+        "Refunds are issued to the original payment method within 5-10 business days."
+      ],
+      "sub_topics": [
+        {
+          "id": "start_return",
+          "label": "Start a return or exchange",
+          "keywords": ["return", "exchange", "send back", "return label"],
+          "steps": [
+            "Open My Orders → Return or exchange.",
+            "Choose refund or replacement.",
+            "Returns are accepted within 30 days of delivery."
+          ]
+        },
+        {
+          "id": "damaged_item",
+          "label": "Item arrived damaged",
+          "keywords": ["defective", "damaged", "wrong item", "broken", "faulty"],
+          "steps": [
+            "Photograph the item and the outer packaging.",
+            "Start a return and select Arrived damaged, attaching the photos.",
+            "We ship a replacement immediately — no need to return first."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "account",
+      "label": "Account & Login",
+      "icon": "🔐",
+      "lucide": "user-round",
+      "keywords": [
+        "account", "login", "log in", "sign in", "signin", "password",
+        "reset password", "forgot password", "locked out", "locked", "two factor", "2fa",
+        "email change", "username", "verify", "verification", "can't log in",
+        "delete account", "security", "authenticator", "reset"
+      ],
+      "steps": [
+        "Use Forgot password on the sign-in screen — the reset link is valid for 30 minutes.",
+        "Check spam and promotions folders if the email hasn't arrived within 2 minutes.",
+        "Accounts lock after 5 failed attempts and unlock automatically after 15 minutes.",
+        "To change your email, confirm the new address from Settings → Profile."
+      ],
+      "sub_topics": [
+        {
+          "id": "reset_password",
+          "label": "I can't reset my password",
+          "keywords": ["reset password", "forgot password", "change password"],
+          "steps": [
+            "Request a fresh link — older links expire after 30 minutes.",
+            "Make sure you're using the email on the account.",
+            "Still stuck? A human can verify your identity manually."
+          ]
+        },
+        {
+          "id": "locked_out",
+          "label": "I'm locked out of my account",
+          "keywords": ["locked out", "can't log in", "2fa", "two factor", "authenticator"],
+          "steps": [
+            "Confirm you're using the correct email and password.",
+            "If 2FA is blocking you, use a backup recovery code from when you set it up.",
+            "If you've lost your 2FA device and codes, request identity verification.",
+            "We'll help you regain access after verifying your identity."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "technical",
+      "label": "Technical Support",
+      "icon": "🛠️",
+      "lucide": "wrench",
+      "keywords": [
+        "technical", "tech", "bug", "error", "crash", "crashing", "not working",
+        "broken", "glitch", "slow", "loading", "freeze", "frozen", "app",
+        "website down", "outage", "can't access", "blank screen", "500 error", "500",
+        "feature not working", "sync", "integration", "issue", "fail"
+      ],
+      "steps": [
+        "Hard-refresh the page or restart the app to clear stale state.",
+        "Try an incognito window with extensions disabled.",
+        "Note the exact error text and what you were doing right before it.",
+        "Check our status page for any active incident."
+      ],
+      "sub_topics": [
+        {
+          "id": "app_error",
+          "label": "Report a bug",
+          "keywords": ["error", "crash", "bug", "glitch", "500 error", "blank screen", "report a bug"],
+          "steps": [
+            "Capture a screenshot or short screen recording.",
+            "Note your browser or device and OS version.",
+            "Send it through and an engineer will pick it up."
+          ]
+        },
+        {
+          "id": "performance",
+          "label": "Something is slow or won't load",
+          "keywords": ["slow", "loading", "freeze", "frozen", "lag", "performance"],
+          "steps": [
+            "Check your internet connection and run a quick speed test.",
+            "Clear the cache and disable browser extensions that might interfere.",
+            "Try an incognito/private window to rule out cached data.",
+            "If the issue is widespread, check our status page for any ongoing outage."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product",
+      "label": "Product Info",
+      "icon": "ℹ️",
+      "lucide": "info",
+      "keywords": [
+        "product", "info", "information", "feature", "features", "how to use",
+        "how do i", "how does", "specification", "specs", "compatible", "compatibility",
+        "warranty", "guide", "tutorial", "documentation", "manual", "does it",
+        "availability", "in stock", "stock", "compare"
+      ],
+      "steps": [
+        "Every product page lists full specs, materials and compatibility.",
+        "Compare plans side by side from the Pricing page.",
+        "Stock notifications are available on out-of-stock items.",
+        "Bulk and team pricing starts at 10 seats or units."
+      ],
+      "sub_topics": [
+        {
+          "id": "features",
+          "label": "Features & how to use it",
+          "keywords": ["feature", "how to use", "how do i", "tutorial", "guide"],
+          "steps": [
+            "Open the product page and read the Features tab.",
+            "Watch the linked getting-started tutorial video.",
+            "Follow the step-by-step setup guide in the Help Center.",
+            "Bookmark the documentation for quick reference later."
+          ]
+        },
+        {
+          "id": "compatibility",
+          "label": "Compatibility & specs",
+          "keywords": ["compatible", "compatibility", "specs", "specification", "warranty"],
+          "steps": [
+            "Open the Specifications tab on the product page.",
+            "Compare the listed requirements with your device or system.",
+            "Check the Compatibility notes for known integrations.",
+            "Review the warranty terms before purchase."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "other",
+      "label": "Other / Something else",
+      "icon": "💬",
+      "lucide": "message-circle",
+      "keywords": [
+        "other", "something else", "general", "question", "help", "support",
+        "feedback", "complaint", "suggestion", "partnership", "press", "human", "agent",
+        "representative", "person", "talk"
+      ],
+      "steps": [
+        "Describe your question in your own words — I'll match it to the right team.",
+        "If I'm not confident, I'll hand you to a human expert straight away.",
+        "You can ask for a human at any point in the conversation."
+      ],
+      "sub_topics": []
+    }
+  ]
+}
